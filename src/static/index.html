@@ -327,7 +327,8 @@
             <div id="alerts"></div>
         </div>
     </div>
-
+        <div id="hero-text" contenteditable="true">Loading...</div>
+        <button onclick="saveContent()">Save</button>
     <script>
         let currentUser = null;
         let authToken = null;
@@ -390,7 +391,32 @@
             if (data) {
                 options.body = JSON.stringify(data);
             }
+             const section = 'hero';
 
+// 1. Load content on page load
+        async function loadContent() {
+            try {
+                const result = await apiCall(`/content/${section}`, 'GET');
+                document.getElementById('hero-text').innerText = result.text;
+            } catch (error) {
+                console.error('Failed to load content:', error.message);
+            }
+        }
+
+        // 2. Save content on button click
+        async function saveContent() {
+            const newText = document.getElementById('hero-text').innerText;
+
+            try {
+                await apiCall(`/content/${section}`, 'POST', { text: newText });
+                alert('Content saved successfully!');
+            } catch (error) {
+                alert('Error saving content: ' + error.message);
+            }
+        }
+
+        // Load content when the page loads
+        window.onload = loadContent;
             const response = await fetch(`/api${endpoint}`, options);
             const result = await response.json();
 
